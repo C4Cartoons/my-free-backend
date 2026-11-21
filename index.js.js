@@ -1,20 +1,30 @@
-const express = require('express'); 
+const express = require('express');
 const { createClient } = require('@supabase/supabase-js');
-const app = express(); 
+
+const app = express();
 app.use(express.json());
-const PORT = process.env.PORT || 3000; 
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_KEY
- );
+
+// Initialize Supabase using environment variables
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_ANON_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+// Basic test route
 app.get('/', (req, res) => {
-  res.json({ status: 'Online', message: 'Backend and Supabase connected!' });
- });
-app.get('/items', async (req, res) => {
-  const { data, error } = await supabase.from('items').select('*');
-  if (error) return res.status(500).json({ error: error.message });
+  res.send('Backend is running successfully!');
+});
+
+// Example route to fetch data from a Supabase table named "users"
+app.get('/users', async (req, res) => {
+  const { data, error } = await supabase.from('users').select('*');
+  if (error) {
+    return res.status(500).json({ error: error.message });
+  }
   res.json(data);
- });
+});
+
+// Start the server
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
- });
+  console.log(`Server is running on port ${PORT}`);
+});
